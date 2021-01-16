@@ -1,9 +1,13 @@
 # gui
 import tkinter as tk
-from tkinter import simpledialog
+from tkinter import Text, simpledialog
 from tkinter import messagebox
+import subprocess as sub
+
 # web scrap
 import re
+import tkinter
+from tkinter.constants import END
 import requests
 import json
 from bs4 import BeautifulSoup
@@ -16,7 +20,7 @@ class MyDialog(simpledialog.Dialog):
         # user input entry
         self.e1 = tk.Entry(master)
         self.e1.grid(row=0, column=1)
-        return self.e1 # initial focus
+        return self.e1 # initial focus 
 
     def apply(self):
         # returns the user input to us
@@ -67,8 +71,9 @@ for rank in user_rank_solo:
     # tier type + tier solo
     print('Ranked Solo')
     print(rank.find('div', {'class': 'TierRank'}).text.strip())
-    print(rank.select('div.TierInfo > span')[0].text.strip())
-    print(rank.select('div.TierInfo > span')[1].text.strip().replace('\n', ' '))
+    if(rank.find('div', {'class': 'TierRank'}).text.strip() != "Unranked"):
+        print(rank.select('div.TierInfo > span')[0].text.strip())
+        print(rank.select('div.TierInfo > span')[1].text.strip().replace('\n', ' '))
 
     print('\n')
 for rank in user_rank_flex:
@@ -137,3 +142,4 @@ data = game_summary[0].get("data-json")
 json_data = json.loads(data)
 for i in range(len(json_data)):
     print(json_data[i]['label'], ': ', json_data[i]['grade'])
+
