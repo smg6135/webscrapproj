@@ -7,30 +7,28 @@ import re
 import requests
 import json
 from bs4 import BeautifulSoup
-# pyqt5
-import sys
-#from pyQt5 import QApplication, Qwidget
 
 class MyDialog(simpledialog.Dialog):
     def body(self, master):
+        # create gui screen
         self.geometry("600x400")
         tk.Label(master, text="What is your summoner ID ?").grid(row=0)
-
+        # user input entry
         self.e1 = tk.Entry(master)
         self.e1.grid(row=0, column=1)
         return self.e1 # initial focus
 
     def apply(self):
+        # returns the user input to us
         first = self.e1.get()
         self.result = first
 
-
+# getting user input to username
 root = tk.Tk()
 root.withdraw()
 user = MyDialog(root, "League Statistics Web Scrapper")
 user.apply
 username = user.result
-print(username)
 
 
 #username = input("whats your summoner id? \n")
@@ -109,7 +107,7 @@ for i in range(3):
     k = user_games[i].select('div.KDA > span.Kill')
     d = user_games[i].select('div.KDA > span.Death')
     a = user_games[i].select('div.KDA > span.Assist')
-    print('K ', k[0].text, ' D ', '/', d[0].text, '/', a[0].text)
+    print('K ', k[0].text, '/', 'D ', d[0].text, '/', 'A ', a[0].text)
 
 
 print('-------------------------------------')
