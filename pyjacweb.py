@@ -6,10 +6,10 @@ from bs4 import BeautifulSoup
 import sys
 #from pyQt5 import QApplication, Qwidget
 
-#username = input("whats your summoner id? \n")
+username = input("whats your summoner id? \n")
 # op.gg, wasted on league request
-urlop = "https://na.op.gg/summoner/userName=rvc1" # + username
-urlwol = "https://wol.gg/stats/na/rvc1/" # + username + "/"
+urlop = "https://na.op.gg/summoner/userName=" + username
+urlwol = "https://wol.gg/stats/na/" + username + "/"
 htmlop = requests.get(urlop).text
 htmlwol = requests.get(urlwol).text
 # beautiful Soup
@@ -58,6 +58,8 @@ spent_mins = soupwol.select('#time-hours')
 print(spent_mins[0].text)
 spent_mins = soupwol.select('#time-days')
 print(spent_mins[0].text)
+world_rank = soupwol.select('#rank-world')
+print(world_rank[0].text.strip())
 
 print('-------------------------------------')
 print('Most played champion')
