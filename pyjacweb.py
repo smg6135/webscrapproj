@@ -30,19 +30,20 @@ user = MyDialog(root, "League Statistics Web Scrapper")
 user.apply
 username = user.result
 
-
-#username = input("whats your summoner id? \n")
 # op.gg, wasted on league request
 urlop = "https://na.op.gg/summoner/userName=" + username
 urlwol = "https://wol.gg/stats/na/" + username + "/"
 urlyour = "https://your.gg/na/profile/" + username
+urlblitz = "https://blitz.gg/lol/profile/na1/" + username
 htmlop = requests.get(urlop).text
 htmlwol = requests.get(urlwol).text
 htmlyour = requests.get(urlyour).text
+htmlblitz = requests.get(urlblitz).text
 # beautiful Soup
 soupop = BeautifulSoup(htmlop, 'html.parser')
 soupwol = BeautifulSoup(htmlwol, 'html.parser')
 soupyour = BeautifulSoup(htmlyour, 'html.parser')
+soupblitz = BeautifulSoup(htmlblitz, 'html.parser')
 
 user_rank_solo = soupop.select('#SummonerLayoutContent > div.tabItem.Content.SummonerLayoutContent.summonerLayout-summary > div.SideContent > div.TierBox.Box > div > div.TierRankInfo')
 user_rank_flex = soupop.select('#SummonerLayoutContent > div.tabItem.Content.SummonerLayoutContent.summonerLayout-summary > div.SideContent > div.sub-tier')
@@ -64,12 +65,15 @@ print('-------------------------------------')
 
 for rank in user_rank_solo:
     # tier type + tier solo
-    print(rank.find('div', {'class': 'RankType'}).text.strip())
+    print('Ranked Solo')
     print(rank.find('div', {'class': 'TierRank'}).text.strip())
+    print(rank.select('div.TierInfo > span')[0].text.strip())
+    print(rank.select('div.TierInfo > span')[1].text.strip().replace('\n', ' '))
 
+    print('\n')
 for rank in user_rank_flex:
     # tier type + tier flex
-    print(rank.find('div', {'class': 'sub-tier__rank-type'}).text.strip())
+    print('Ranked Flex')
     print(rank.find('div', {'class': 'sub-tier__rank-tier'}).text.strip())
 
 most_played = soupop.select('#SummonerLayoutContent > div.tabItem.Content.SummonerLayoutContent.summonerLayout-summary > div.SideContent > div')[2].select('div')[1].select('div')[0].select('div')[0].select('div')[0]
@@ -86,8 +90,6 @@ spent_mins = soupwol.select('#time-hours')
 print(spent_mins[0].text)
 spent_mins = soupwol.select('#time-days')
 print(spent_mins[0].text)
-world_rank = soupwol.select('#rank-world')
-print(world_rank[0].text.strip().replace(" ", ""))
 
 print('-------------------------------------')
 print('Most played champion')
@@ -100,14 +102,31 @@ print('K ', most_played_kda[0].text, most_played_kda[1].text,'D ', most_played_k
 user_games = soupop.select('#SummonerLayoutContent > div.tabItem.Content.SummonerLayoutContent.summonerLayout-summary > div.RealContent > div > div.Content > div.GameItemList > div.GameItemWrap')
 
 print('-------------------------------------')
-print('recent 3 games summary')
+print('recent 5 games summary')
 print('-------------------------------------')
-for i in range(3):
-    print(user_games[i].find('div').get('data-game-result'))
+for i in range(5):
+    print('~~~~~~~~~GAME',i+1,'~~~~~~~~~')
+    user_champ = soupop.select('#SummonerLayoutContent > div.tabItem.Content.SummonerLayoutContent.summonerLayout-summary > div.RealContent > div > div.Content > div.GameItemList > div')
+    print('Champion played : ', user_champ[i].select('div.ChampionName')[0].text.strip())
+
+    # Role
+    user_role = soupblitz.select('#scroll-view-main > div > div > div > div.ProfileLayout__ProfileColumns-sc-7b34zi-0.fJwYnF > div.ProfileLayout__ProfileRightCol-sc-7b34zi-2.kHtVCs.Columns__Column-sc-24rxii-1.kbeXNP > div > div.Inner-sc-7vmxjm-0.cpZSJT > div:nth-child(1) > div:nth-child(2) > a:nth-child(1) > div > div.profile_match-image > div > svg > title')[0].text
+    print('Role : ', user_role.replace("role-", ""))
+
+    # W or L
+    print("Game : ", user_games[i].find('div').get('data-game-result'))
     k = user_games[i].select('div.KDA > span.Kill')
     d = user_games[i].select('div.KDA > span.Death')
     a = user_games[i].select('div.KDA > span.Assist')
-    print('K ', k[0].text, '/', 'D ', d[0].text, '/', 'A ', a[0].text)
+    # KDA
+    kdaratio = user_games[i].select('div.KDARatio > span.KDARatio')
+    print('KDA: ', 'K ', k[0].text, '/', 'D ', d[0].text, '/', 'A ', a[0].text, ' = ', kdaratio[0].text)
+    your_games = soupyour.select('body > div > div.container-fluid.page-body-wrapper > div > div > div.row.mt-3 > div.col-lg-8.col-12 > div.d-flex.flex-column.mt-3 > div')
+    my_ratings = your_games[i].select('div.gg-ggx-box-on-matchlist > div.gg-ggx-on-matchlist')
+    print('My rating (0 ~ 10) : ', my_ratings[0].text.strip())
+    print('Team rating (F ~ S) : ', my_ratings[1].text.strip())
+    print('Lane rating (1:9 FF ~ 9:1 GG) : ', my_ratings[2].text.strip())
+
 
 
 print('-------------------------------------')
